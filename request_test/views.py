@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import UploadedFile
 
 def request_info_view(request):
     context = {
@@ -17,3 +18,18 @@ def request_info_view(request):
     request.session['demo'] = '세션에서 저장한 값입니다.'
 
     return render(request, 'request_test/request_info.html', context)
+
+def file_upload_view(request):
+    uploaded_file_url = None
+    title = None
+
+    if request.method == 'POST' and request.FILES.get('file'):
+        file = request.FILES['file']
+        title = request.POST.get('title', '')
+        uploaded = UploadedFile.objects.create(title=title, file=file)
+        uploaded_file_url = uploaded.file.url
+
+    return render(request, 'request_test/upload_file.html', {
+        'uploaded_file_url': uploaded_file_url,
+        'title': title,
+    })
